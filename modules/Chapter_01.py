@@ -1,11 +1,25 @@
 import matplotlib.pyplot as plt
 from tensorflow import keras
 import tensorflow as tf
+import sys
+
+sys.path.append("../")
+from modules import Common
 
 
 # ---------------------------------------------------------------------
 # Dataset
 # ---------------------------------------------------------------------
+def prepare():
+    # Mnist dataset
+    (train_samples, train_labels), (test_samples, test_labels) = dataset(
+        with_text=False
+    )
+    # Shuffle dataset
+    train_samples, train_labels = Common.shuffle_data(train_samples, train_labels)
+    return train_samples, train_labels, test_samples, test_labels
+
+
 def dataset(with_text=True):
     mnist = tf.keras.datasets.mnist
     (x_train, y_train), (x_test, y_test) = mnist.load_data()
@@ -64,8 +78,7 @@ def get_model(learning_rate=0.001):
     # Configure the model for forward propagation
     model = keras.Sequential(
         [
-            keras.layers.Dense(units=96, activation=tf.nn.relu),
-            keras.layers.Dense(units=96, activation=tf.nn.relu),
+            keras.layers.Dense(units=256, activation=tf.nn.relu),
             keras.layers.Dense(units=10, activation=tf.nn.softmax),
         ]
     )
@@ -100,92 +113,12 @@ def get_large_model(learning_rate=0.001):
 # ---------------------------------------------------------------------
 # Train
 # ---------------------------------------------------------------------
-def train(x, y, model, epoch, val_percent=0):
+def train(x, y, model, epoch, val_percent=0.2):
     # Train the model
     history = model.fit(
         x=x, y=y, validation_split=val_percent, epochs=epoch, verbose=False
     )
     return history
-
-
-# ---------------------------------------------------------------------
-# Explore
-# ---------------------------------------------------------------------
-def explore(history):
-    print(history.history.keys())
-    print("Training Loss: ", history.history["loss"][-1])
-    print("Training Accuracy: ", history.history["sparse_categorical_accuracy"][-1])
-    # Loss Plot
-    plt.title("Training Loss")
-    plt.plot(history.history["loss"], "b")
-    plt.show()
-    # Accuracy Plot
-    plt.title("Training Accuracy")
-    plt.plot(history.history["sparse_categorical_accuracy"], "b")
-    plt.show()
-
-
-def explore_val(history):
-    # Accuraries
-    print(
-        "Train Accuracy : {}".format(history.history["sparse_categorical_accuracy"][-1])
-    )
-    print(
-        "Validation Accuracy : {}".format(
-            history.history["val_sparse_categorical_accuracy"][-1]
-        )
-    )
-    # Plot
-    plt.title("Train/Val Accuracy")
-    plt.plot(
-        history.history["sparse_categorical_accuracy"], "b", label="Training accuracy"
-    )
-    plt.plot(
-        history.history["val_sparse_categorical_accuracy"],
-        "r",
-        label="Validation accuracy",
-    )
-    plt.legend()
-    plt.show()
-
-
-def explore_val_multi(
-    history0, history1, history2, name1="White Noise", name2="Zero Channel"
-):
-    print(
-        "Validation Accuracy : {}".format(
-            history0.history["val_sparse_categorical_accuracy"][-1]
-        )
-    )
-    print(
-        "Validation Accuracy {}: {}".format(
-            name2, history2.history["val_sparse_categorical_accuracy"][-1]
-        )
-    )
-    print(
-        "Validation Accuracy {}: {}".format(
-            name1, history1.history["val_sparse_categorical_accuracy"][-1]
-        )
-    )
-    # Accuracy Plot
-    plt.title("Training Accuracy")
-    plt.plot(
-        history0.history["sparse_categorical_accuracy"],
-        "b",
-        label="Validation accuracy",
-    )
-    plt.plot(
-        history1.history["sparse_categorical_accuracy"],
-        "g",
-        label="Validation accuracy with white noise",
-    )
-    plt.plot(
-        history2.history["sparse_categorical_accuracy"],
-        "r",
-        label="Validation accuracy with zeros channels",
-    )
-    plt.legend()
-    plt.show()
 
 
 # ---------------------------------------------------------------------
