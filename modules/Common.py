@@ -65,6 +65,17 @@ def plot(
     plt.show()
 
 
+def plot_simple(data, labels=["Train Loss", "Val Loss"], start_index=0):
+    x_axis = range(0, len(data[0]), 1)
+    fig = plt.figure(figsize=(20, 10))
+    axis = fig.add_subplot(1, 1, 1)
+    for y, l in zip(data, labels):
+        axis.plot(x_axis[start_index:], y[start_index:], label=l)
+    axis.legend()
+    axis.grid()
+    plt.show()
+
+
 """
 -------------------------------------------
 Data Split Functions
@@ -91,15 +102,14 @@ def split_data_kfold(data, fold_count, fold_size):
     Note: Don't shuffle data between folds
     """
     val = data[fold_count * fold_size : (fold_count + 1) * fold_size]
-    train = np.concatenate(
-        [
-            # Pre Validation Fold
-            data[: fold_count * fold_size],
-            # Post Validation Fold
-            data[(fold_count + 1) * fold_size :],
-        ],
-        axis=0,
-    )
+    pre_fold = data[: fold_count * fold_size]
+    post_fold = data[(fold_count + 1) * fold_size :]
+    train = np.concatenate([pre_fold, post_fold], axis=0)
+    """
+    Note:
+    np.vstack does not work when any array is empty
+    train = np.vstack(tup=([pre_fold, post_fold]))
+    """
     return train, val
 
 
@@ -139,20 +149,11 @@ Data Augmentation Functions
 
 def add_white_noise(input):
     print(input.shape)
-    return np.concatenate(
-        [
-            input,
-            np.random.random(size=(input.shape[0], input.shape[1])),
-        ],
-        axis=1,
-    )
+    return np.hstack((input, np.random.random(size=(input.shape[0], input.shape[1]))))
 
 
 def add_zero_channel(input):
-    return np.concatenate(
-        [input, np.zeros(shape=(input.shape[0], input.shape[1]))],
-        axis=1,
-    )
+    return np.hstack((input, np.zeros(shape=(input.shape[0], input.shape[1]))))
 
 
 """
