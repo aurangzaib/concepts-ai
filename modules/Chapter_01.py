@@ -1,3 +1,4 @@
+from gc import callbacks
 import matplotlib.pyplot as plt
 from tensorflow import keras
 import tensorflow as tf
@@ -12,12 +13,10 @@ from modules import Common
 # ---------------------------------------------------------------------
 def prepare():
     # Mnist dataset
-    (train_samples, train_labels), (test_samples, test_labels) = dataset(
-        with_text=False
-    )
+    (train_samples, train_labels), (test_samples, test_labels) = dataset(with_text=False)
     # Shuffle dataset
     train_samples, train_labels = Common.shuffle_data(train_samples, train_labels)
-    return train_samples, train_labels, test_samples, test_labels
+    return (train_samples, train_labels), (test_samples, test_labels)
 
 
 def dataset(with_text=True):
@@ -40,10 +39,7 @@ def dataset(with_text=True):
     x_train = x_train.astype("float32") / 255
     x_test = x_test.astype("float32") / 255
 
-    return (x_train, y_train), (
-        x_test,
-        y_test,
-    )
+    return (x_train, y_train), (x_test, y_test)
 
 
 # ---------------------------------------------------------------------
@@ -91,6 +87,22 @@ def get_model(learning_rate=0.001):
     return model
 
 
+def get_function_model(metrics=[keras.metrics.SparseCategoricalAccuracy()]):
+    # Configure the model for forward propagation
+    inputs = keras.layers.Input(shape=(28 * 28))
+    features = keras.layers.Dense(units=256, activation=tf.nn.relu)(inputs)
+    features = keras.layers.Dropout(0.01)(features)
+    outputs = keras.layers.Dense(units=10, activation=tf.nn.softmax)(features)
+    model = keras.Model(inputs=inputs, outputs=outputs)
+    # Configure the model for backward propagation
+    model.compile(
+        optimizer=keras.optimizers.legacy.RMSprop(),
+        loss=keras.losses.SparseCategoricalCrossentropy(),
+        metrics=metrics,
+    )
+    return model
+
+
 def get_large_model(learning_rate=0.001):
     # Configure the model for forward propagation
     model = keras.Sequential(
@@ -113,10 +125,15 @@ def get_large_model(learning_rate=0.001):
 # ---------------------------------------------------------------------
 # Train
 # ---------------------------------------------------------------------
-def train(x, y, model, epoch, val_percent=0.2):
+def train(x, y, model, epoch=5, val_percent=0.3, callbacks=None):
     # Train the model
     history = model.fit(
-        x=x, y=y, validation_split=val_percent, epochs=epoch, verbose=False
+        x=x,
+        y=y,
+        validation_split=val_percent,
+        epochs=epoch,
+        verbose=False,
+        callbacks=callbacks,
     )
     return history
 
@@ -124,21 +141,23 @@ def train(x, y, model, epoch, val_percent=0.2):
 # ---------------------------------------------------------------------
 # Evaluate
 # ---------------------------------------------------------------------
-def evaluate(x, y, model):
+def evaluate(x, y, model, silent=False):
     # Evaluate the model
     test_loss, test_acc = model.evaluate(x, y, verbose=False)
-    print("Test Loss: ", test_loss)
-    print("Test Acc: ", test_acc)
+    if silent is False:
+        print("Test Loss: ", test_loss)
+        print("Test Acc: ", test_acc)
 
 
 # ---------------------------------------------------------------------
 # Predict
 # ---------------------------------------------------------------------
-def predict(x, y, model):
+def predict(x, y, model, silent=False):
     x_ground = x[:5]
     y_predict = model.predict(x_ground, verbose=False)
-    for index in range(len(x_ground)):
-        print()
-        print("Ground: ", y[index])
-        print("Prediction: ", (y_predict[index].argmax()))
-        print("Confidence: ", (y_predict[index].max()))
+    if silent is False:
+        for index in range(len(x_ground)):
+            print()
+            print("Ground: ", y[index])
+            print("Prediction: ", (y_predict[index].argmax()))
+            print("Confidence: ", (y_predict[index].max()))
