@@ -1,4 +1,3 @@
-from gc import callbacks
 import matplotlib.pyplot as plt
 from tensorflow import keras
 import tensorflow as tf
@@ -8,9 +7,11 @@ sys.path.append("../")
 from modules import Common
 
 
-# ---------------------------------------------------------------------
+# =====================================================================
 # Dataset
-# ---------------------------------------------------------------------
+# =====================================================================
+
+
 def prepare():
     # Mnist dataset
     (train_samples, train_labels), (test_samples, test_labels) = dataset(with_text=False)
@@ -35,33 +36,41 @@ def dataset(with_text=True):
     x_train = x_train.reshape((x_train.shape[0], x_train.shape[1] * x_train.shape[2]))
     x_test = x_test.reshape((x_test.shape[0], x_test.shape[1] * x_test.shape[2]))
 
-    # Scale the dataset
+    # Normalize the dataset
     x_train = x_train.astype("float32") / 255
     x_test = x_test.astype("float32") / 255
 
     return (x_train, y_train), (x_test, y_test)
 
 
-# ---------------------------------------------------------------------
+# =====================================================================
 # Visualize
-# ---------------------------------------------------------------------
+# =====================================================================
+
+
 def visualize(x, y):
     plt.imshow(x[0], cmap=plt.cm.binary)
     print(y[0])
     plt.show()
 
 
-# ---------------------------------------------------------------------
+# =====================================================================
 # Model
-# ---------------------------------------------------------------------
+# =====================================================================
+
+
 def get_small_model(learning_rate=0.001):
-    # Configure the model for forward propagation
+    # ---------------------------------
+    # Forward Propagation Configuration
+    # ---------------------------------
     model = keras.Sequential(
         [
             keras.layers.Dense(units=10, activation=tf.nn.softmax),
         ]
     )
-    # Configure the model for backward propagation
+    # ---------------------------------
+    # Backward Propagation Configuration
+    # ---------------------------------
     model.compile(
         loss=tf.keras.losses.SparseCategoricalCrossentropy(),
         optimizer=tf.keras.optimizers.legacy.RMSprop(learning_rate),
@@ -71,14 +80,18 @@ def get_small_model(learning_rate=0.001):
 
 
 def get_model(learning_rate=0.001):
-    # Configure the model for forward propagation
+    # ---------------------------------
+    # Forward Propagation Configuration
+    # ---------------------------------
     model = keras.Sequential(
         [
             keras.layers.Dense(units=256, activation=tf.nn.relu),
             keras.layers.Dense(units=10, activation=tf.nn.softmax),
         ]
     )
-    # Configure the model for backward propagation
+    # ---------------------------------
+    # Backward Propagation Configuration
+    # ---------------------------------
     model.compile(
         loss=tf.keras.losses.SparseCategoricalCrossentropy(),
         optimizer=tf.keras.optimizers.legacy.RMSprop(learning_rate),
@@ -87,24 +100,31 @@ def get_model(learning_rate=0.001):
     return model
 
 
-def get_function_model(metrics=[keras.metrics.SparseCategoricalAccuracy()]):
-    # Configure the model for forward propagation
+def get_function_model(metrics=[keras.metrics.SparseCategoricalAccuracy()], with_compile=True):
+    # ---------------------------------
+    # Forward Propagation Configuration
+    # ---------------------------------
     inputs = keras.layers.Input(shape=(28 * 28))
     features = keras.layers.Dense(units=256, activation=tf.nn.relu)(inputs)
     features = keras.layers.Dropout(0.01)(features)
     outputs = keras.layers.Dense(units=10, activation=tf.nn.softmax)(features)
     model = keras.Model(inputs=inputs, outputs=outputs)
-    # Configure the model for backward propagation
-    model.compile(
-        optimizer=keras.optimizers.legacy.RMSprop(),
-        loss=keras.losses.SparseCategoricalCrossentropy(),
-        metrics=metrics,
-    )
+    # ---------------------------------
+    # Backward Propagation Configuration
+    # ---------------------------------
+    if with_compile:
+        model.compile(
+            optimizer=keras.optimizers.legacy.RMSprop(),
+            loss=keras.losses.SparseCategoricalCrossentropy(),
+            metrics=metrics,
+        )
     return model
 
 
 def get_large_model(learning_rate=0.001):
-    # Configure the model for forward propagation
+    # ---------------------------------
+    # Forward Propagation Configuration
+    # ---------------------------------
     model = keras.Sequential(
         [
             keras.layers.Dense(units=256, activation=tf.nn.relu),
@@ -113,7 +133,9 @@ def get_large_model(learning_rate=0.001):
             keras.layers.Dense(units=10, activation=tf.nn.softmax),
         ]
     )
-    # Configure the model for backward propagation
+    # ---------------------------------
+    # Backward Propagation Configuration
+    # ---------------------------------
     model.compile(
         loss=tf.keras.losses.SparseCategoricalCrossentropy(),
         optimizer=tf.keras.optimizers.legacy.RMSprop(learning_rate),
@@ -122,25 +144,30 @@ def get_large_model(learning_rate=0.001):
     return model
 
 
-# ---------------------------------------------------------------------
+# =====================================================================
 # Train
-# ---------------------------------------------------------------------
-def train(x, y, model, epoch=5, val_percent=0.3, callbacks=None):
+# =====================================================================
+
+
+def train(x, y, model, epoch=5, val_percent=0.3, batch_size=None, callbacks=None):
     # Train the model
     history = model.fit(
         x=x,
         y=y,
         validation_split=val_percent,
         epochs=epoch,
-        verbose=False,
+        batch_size=batch_size,
         callbacks=callbacks,
+        verbose=False,
     )
     return history
 
 
-# ---------------------------------------------------------------------
+# =====================================================================
 # Evaluate
-# ---------------------------------------------------------------------
+# =====================================================================
+
+
 def evaluate(x, y, model, silent=False):
     # Evaluate the model
     test_loss, test_acc = model.evaluate(x, y, verbose=False)
@@ -149,9 +176,11 @@ def evaluate(x, y, model, silent=False):
         print("Test Acc: ", test_acc)
 
 
-# ---------------------------------------------------------------------
+# =====================================================================
 # Predict
-# ---------------------------------------------------------------------
+# =====================================================================
+
+
 def predict(x, y, model, silent=False):
     x_ground = x[:5]
     y_predict = model.predict(x_ground, verbose=False)

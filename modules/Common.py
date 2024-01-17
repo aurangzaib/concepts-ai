@@ -1,6 +1,8 @@
 import matplotlib.pylab as plt
+from typing import Callable
 import numpy as np
-
+import functools
+import time
 
 """
 -------------------------------------------
@@ -9,9 +11,7 @@ Data Visualization Functions
 """
 
 
-def plot(
-    data, labels, window_titles=["Accuracy", "Loss"], only_val=False, start_index=0
-):
+def plot(data, labels, window_titles=["Accuracy", "Loss"], only_val=False, start_index=0):
     # Name of loss and accuracy metrics
     keys = history_keys(data[0])
     loss_name, acc_name = keys[0], keys[1]
@@ -188,3 +188,19 @@ def key_value_swap(dataset):
 def valuekey_to_keyvalue(dataset, input: list):
     dictionary = key_value_swap(dataset)
     return [dictionary[i] for i in input]
+
+
+def timer(func: Callable):
+    @functools.wraps(func)  # Recommended: To retain function information
+    def wrapper(*argv, **kwargs):
+        t1 = time.perf_counter()  # Start time
+        data = func(*argv, **kwargs)  # Call decorated function
+        t2 = time.perf_counter()  # End time
+        print("{}: {:.10f}ms".format(func.__name__, t2 - t1))
+        return data  # Return result of decorated function
+
+    return wrapper  # Return wrapper
+
+
+def own_properties(instance):
+    return [attr for attr in dir(instance) if not attr.startswith("_")]
