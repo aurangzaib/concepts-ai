@@ -11,7 +11,7 @@ from modules import Common
 class Constant:
     input_dim = 2
     output_dim = 1
-    epoch = 500
+    epochs = 500
     n = 0.001
 
 
@@ -26,12 +26,8 @@ class Chapter_03:
         # Generate Dataset
         # ---------------------------------------------------------------
 
-        pos_samples = np.random.multivariate_normal(
-            mean=[3, 0], cov=[[1.0, 0.5], [0.5, 1.0]], size=n_samples
-        )
-        neg_samples = np.random.multivariate_normal(
-            mean=[0, 3], cov=[[1.0, 0.5], [0.5, 1.0]], size=n_samples
-        )
+        pos_samples = np.random.multivariate_normal(mean=[3, 0], cov=[[1.0, 0.5], [0.5, 1.0]], size=n_samples)
+        neg_samples = np.random.multivariate_normal(mean=[0, 3], cov=[[1.0, 0.5], [0.5, 1.0]], size=n_samples)
         pos_labels = np.ones(shape=(n_samples, 1))
         neg_labels = np.zeros(shape=(n_samples, 1))
 
@@ -40,9 +36,7 @@ class Chapter_03:
 
         samples = np.vstack(tup=(pos_samples, neg_samples)).astype(np.float32)
         labels = np.vstack(tup=(pos_labels, neg_labels)).astype(np.float32)
-        self.test_samples = np.vstack(tup=(pos_test_samples, neg_test_samples)).astype(
-            np.float32
-        )
+        self.test_samples = np.vstack(tup=(pos_test_samples, neg_test_samples)).astype(np.float32)
 
         # ---------------------------------------------------------------
         # Shuffle Dataset

@@ -36,7 +36,7 @@ def dataset(with_text=True):
     x_train = x_train.reshape((x_train.shape[0], x_train.shape[1] * x_train.shape[2]))
     x_test = x_test.reshape((x_test.shape[0], x_test.shape[1] * x_test.shape[2]))
 
-    # Normalize the dataset
+    # Rescale the dataset (0-255 to 0-1)
     x_train = x_train.astype("float32") / 255
     x_test = x_test.astype("float32") / 255
 
@@ -121,10 +121,10 @@ def get_function_model(metrics=[keras.metrics.SparseCategoricalAccuracy()], with
     return model
 
 
+# ---------------------------------
+# Forward Propagation Configuration
+# ---------------------------------
 def get_large_model(learning_rate=0.001):
-    # ---------------------------------
-    # Forward Propagation Configuration
-    # ---------------------------------
     model = keras.Sequential(
         [
             keras.layers.Dense(units=256, activation=tf.nn.relu),
@@ -133,9 +133,14 @@ def get_large_model(learning_rate=0.001):
             keras.layers.Dense(units=10, activation=tf.nn.softmax),
         ]
     )
-    # ---------------------------------
-    # Backward Propagation Configuration
-    # ---------------------------------
+    compile(model, learning_rate)
+    return model
+
+
+# ---------------------------------
+# Backward Propagation Configuration
+# ---------------------------------
+def compile(model, learning_rate=0.001):
     model.compile(
         loss=tf.keras.losses.SparseCategoricalCrossentropy(),
         optimizer=tf.keras.optimizers.legacy.RMSprop(learning_rate),
@@ -149,13 +154,13 @@ def get_large_model(learning_rate=0.001):
 # =====================================================================
 
 
-def train(x, y, model, epoch=5, val_percent=0.3, batch_size=None, callbacks=None):
+def train(x, y, model, epochs=5, val_percent=0.3, batch_size=None, callbacks=None):
     # Train the model
     history = model.fit(
         x=x,
         y=y,
         validation_split=val_percent,
-        epochs=epoch,
+        epochs=epochs,
         batch_size=batch_size,
         callbacks=callbacks,
         verbose=False,

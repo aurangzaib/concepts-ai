@@ -1,4 +1,5 @@
 import matplotlib.pylab as plt
+from tensorflow import keras
 from typing import Callable
 import numpy as np
 import functools
@@ -165,7 +166,7 @@ Data Manipulation Functions
 
 def shuffle_data(input_samples, input_labels):
     shuffle_indices = np.random.permutation(len(input_samples))
-    return input_samples[shuffle_indices], input_labels[shuffle_indices]
+    return (input_samples[shuffle_indices], input_labels[shuffle_indices])
 
 
 def multihot_encode_data(input_samples, dimension):
@@ -188,6 +189,27 @@ def key_value_swap(dataset):
 def valuekey_to_keyvalue(dataset, input: list):
     dictionary = key_value_swap(dataset)
     return [dictionary[i] for i in input]
+
+
+"""
+-------------------------------------------
+Training Manipulation Functions
+-------------------------------------------
+"""
+
+
+def callbacks(metric="val_sparse_categorical_accuracy", log_dir="../resources/logs"):
+    return [
+        keras.callbacks.EarlyStopping(monitor=metric, patience=3),
+        keras.callbacks.TensorBoard(log_dir=log_dir),
+    ]
+
+
+"""
+-------------------------------------------
+Helper Functions
+-------------------------------------------
+"""
 
 
 def timer(func: Callable):
