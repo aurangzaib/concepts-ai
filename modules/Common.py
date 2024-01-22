@@ -68,7 +68,7 @@ def plot(data, labels, window_titles=["Accuracy", "Loss"], only_val=False, start
 
 def plot_simple(data, labels=["Train Loss", "Val Loss"], start_index=0):
     x_axis = range(0, len(data[0]), 1)
-    fig = plt.figure(figsize=(20, 10))
+    fig = plt.figure(figsize=(20, 5))
     axis = fig.add_subplot(1, 1, 1)
     for y, l in zip(data, labels):
         axis.plot(x_axis[start_index:], y[start_index:], label=l)
@@ -200,8 +200,8 @@ Training Manipulation Functions
 
 def callbacks(
     metric_stop="val_loss",
-    metric_model="val_loss",
-    model_dir=".../resources/models/tmp/model.keras",
+    metric_model="val_sparse_categorical_accuracy",
+    model_dir="../resources/models/tmp/model.keras",
     log_dir="../resources/logs",
 ):
     return [

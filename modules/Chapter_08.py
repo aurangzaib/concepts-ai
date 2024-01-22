@@ -63,40 +63,50 @@ def make_subsets(original_dir, new_base_dir):
     make_subset("test", 1500, 2500, original_dir, new_base_dir)
 
 
-def get_model():
-    return get_model_with_downsampling()
+def compile(model, model_path):
+    model_dir = "../resources/models/cats_dogs/"
+    model.compile(
+        loss=keras.losses.BinaryCrossentropy(),
+        metrics=[keras.metrics.BinaryAccuracy()],
+        optimizer=keras.optimizers.legacy.RMSprop(),
+    )
+
+    callbacks = [
+        keras.callbacks.EarlyStopping(monitor="val_loss", patience=2),
+        keras.callbacks.TensorBoard(log_dir="../resources/logs"),
+        keras.callbacks.ModelCheckpoint(
+            filepath=model_dir + "/" + model_path,
+            monitor="val_binary_accuracy",
+            save_best_only=True,
+        ),
+    ]
+    return model, callbacks
 
 
-def get_model_without_downsampling():
-    inputs = keras.Input(shape=(28, 28, 1))
-    x = keras.layers.Conv2D(filters=32, kernel_size=3, activation=tf.nn.relu)(inputs)
-    x = keras.layers.Conv2D(filters=64, kernel_size=3, activation=tf.nn.relu)(x)
-    x = keras.layers.Conv2D(filters=128, kernel_size=3, activation=tf.nn.relu)(x)
-    x = keras.layers.Flatten()(x)
-    outputs = keras.layers.Dense(units=10, activation=tf.nn.softmax)(x)
-    model = keras.Model(inputs=inputs, outputs=outputs)
-    return model
+def train_batch(train_dataset, val_dataset, test_dataset, model, model_path, epochs, batch_size):
+    model, callbacks = compile(model, model_path)
+    history = model.fit(
+        train_dataset,
+        validation_data=val_dataset,
+        epochs=epochs,
+        callbacks=callbacks,
+        verbose=False,
+        batch_size=batch_size,
+    )
+    model.evaluate(test_dataset)
+    Common.plot(data=[history], labels=[model_path])
 
 
-def get_model_with_downsampling():
-    inputs = keras.Input(shape=(28, 28, 1))
-    x = keras.layers.Conv2D(filters=32, kernel_size=3, activation=tf.nn.relu)(inputs)
-    x = keras.layers.MaxPooling2D(pool_size=2)(x)
-    x = keras.layers.Conv2D(filters=64, kernel_size=3, activation=tf.nn.relu)(x)
-    x = keras.layers.MaxPooling2D(pool_size=2)(x)
-    x = keras.layers.Conv2D(filters=128, kernel_size=3, activation=tf.nn.relu)(x)
-    x = keras.layers.Flatten()(x)
-    outputs = keras.layers.Dense(units=10, activation=tf.nn.softmax)(x)
-    model = keras.Model(inputs=inputs, outputs=outputs)
-    return model
-
-
-def get_model_with_padding():
-    inputs = keras.Input(shape=(28, 28, 1))
-    x = keras.layers.Conv2D(filters=32, kernel_size=3, padding="same", activation=tf.nn.relu)(inputs)
-    x = keras.layers.Conv2D(filters=64, kernel_size=3, padding="same", activation=tf.nn.relu)(x)
-    x = keras.layers.Conv2D(filters=128, kernel_size=3, padding="same", activation=tf.nn.relu)(x)
-    x = keras.layers.Flatten()(x)
-    outputs = keras.layers.Dense(units=10, activation=tf.nn.softmax)(x)
-    model = keras.Model(inputs=inputs, outputs=outputs)
-    return model
+def train(x_train, y_train, x_val, y_val, x_test, y_test, model, model_path, epochs, batch_size):
+    model, callbacks = compile(model, model_path)
+    history = model.fit(
+        x=x_train,
+        y=y_train,
+        validation_data=(x_val, y_val),
+        epochs=epochs,
+        callbacks=callbacks,
+        verbose=False,
+        batch_size=batch_size,
+    )
+    model.evaluate(x_test, y_test)
+    Common.plot(data=[history], labels=[model_path])
