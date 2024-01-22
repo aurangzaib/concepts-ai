@@ -17,7 +17,7 @@ def plot(data, labels, window_titles=["Accuracy", "Loss"], only_val=False, start
     keys = history_keys(data[0])
     loss_name, acc_name = keys[0], keys[1]
     x = [value for value in range(len(data[0].history[acc_name]))]
-    fig = plt.figure(figsize=(20, 10))
+    fig = plt.figure(figsize=(20, 5))
     val_acc_name = "val_{}".format(acc_name)
     val_loss_name = "val_{}".format(loss_name)
 
@@ -198,9 +198,15 @@ Training Manipulation Functions
 """
 
 
-def callbacks(metric="val_sparse_categorical_accuracy", log_dir="../resources/logs"):
+def callbacks(
+    metric_stop="val_loss",
+    metric_model="val_loss",
+    model_dir=".../resources/models/tmp/model.keras",
+    log_dir="../resources/logs",
+):
     return [
-        keras.callbacks.EarlyStopping(monitor=metric, patience=3),
+        keras.callbacks.EarlyStopping(monitor=metric_stop, patience=3),
+        keras.callbacks.ModelCheckpoint(filepath=model_dir, monitor=metric_model, save_only_best=True),
         keras.callbacks.TensorBoard(log_dir=log_dir),
     ]
 

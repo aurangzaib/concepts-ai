@@ -154,15 +154,50 @@ def compile(model, learning_rate=0.001):
 # =====================================================================
 
 
-def train(x, y, model, epochs=5, val_percent=0.3, batch_size=None, callbacks=None):
+# ----------------------------------
+# Validation data as percentage
+# ----------------------------------
+def train(x, y, model, val_percent=0.3, batch_size=1024, callbacks=None, epochs=1):
     # Train the model
     history = model.fit(
         x=x,
         y=y,
         validation_split=val_percent,
-        epochs=epochs,
         batch_size=batch_size,
         callbacks=callbacks,
+        verbose=False,
+        epochs=epochs,
+    )
+    return history
+
+
+# ----------------------------------
+# Validation data as dataset
+# ----------------------------------
+def train_val(x, y, x_val, y_val, model, batch_size=1024, callbacks=None, epochs=1):
+    # Train the model
+    history = model.fit(
+        x=x,
+        y=y,
+        validation_data=(x_val, y_val),
+        batch_size=batch_size,
+        callbacks=callbacks,
+        epochs=epochs,
+        verbose=False,
+    )
+    return history
+
+
+# ----------------------------------
+# Train/Validation data as batch
+# ----------------------------------
+def train_batch(train_dataset, val_dataset, model, callbacks, batch_size=1024, epochs=1):
+    history = model.fit(
+        train_dataset,
+        validation_data=val_dataset,
+        batch_size=batch_size,
+        callbacks=callbacks,
+        epochs=epochs,
         verbose=False,
     )
     return history
@@ -173,12 +208,24 @@ def train(x, y, model, epochs=5, val_percent=0.3, batch_size=None, callbacks=Non
 # =====================================================================
 
 
+# ----------------------------------
+# Validation data as dataset
+# ----------------------------------
 def evaluate(x, y, model, silent=False):
     # Evaluate the model
     test_loss, test_acc = model.evaluate(x, y, verbose=False)
     if silent is False:
         print("Test Loss: ", test_loss)
         print("Test Acc: ", test_acc)
+
+
+# ----------------------------------
+# Train/Validation data as batch
+# ----------------------------------
+def evaluate_batch(dataset, model):
+    val_loss, val_accuracy = model.evaluate(dataset, verbose=False)
+    print("Test Loss: ", val_loss)
+    print("Test Accuracy: ", val_accuracy)
 
 
 # =====================================================================
