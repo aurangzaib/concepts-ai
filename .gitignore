@@ -165,4 +165,3 @@ cython_debug/
 **/resources/models/tmp
 **/resources/images/tmp
 **/resources/datasets
-**/resources/models/cats_dogs

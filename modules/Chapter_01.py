@@ -140,11 +140,11 @@ def get_large_model(learning_rate=0.001):
 # ---------------------------------
 # Backward Propagation Configuration
 # ---------------------------------
-def compile(model, learning_rate=0.001):
+def compile(model, metrics=keras.metrics.SparseCategoricalAccuracy(), learning_rate=0.001):
     model.compile(
         loss=tf.keras.losses.SparseCategoricalCrossentropy(),
         optimizer=tf.keras.optimizers.legacy.RMSprop(learning_rate),
-        metrics=[keras.metrics.SparseCategoricalAccuracy()],
+        metrics=[metrics],
     )
     return model
 

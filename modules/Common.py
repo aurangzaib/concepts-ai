@@ -77,6 +77,16 @@ def plot_simple(data, labels=["Train Loss", "Val Loss"], start_index=0):
     plt.show()
 
 
+def plot_img(img1, img2):
+    fig = plt.figure(figsize=(20, 8))
+    axis1 = fig.add_subplot(1, 2, 1)
+    axis1.imshow(img1)
+    axis2 = fig.add_subplot(1, 2, 2)
+    axis2.imshow(img2)
+    axis1.axis("off"), axis2.axis("off")
+    plt.show()
+
+
 """
 -------------------------------------------
 Data Split Functions
