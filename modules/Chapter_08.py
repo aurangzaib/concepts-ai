@@ -5,13 +5,13 @@ import shutil
 import os
 
 # User Libraries
-from modules import Common
+from modules import common
 
 
 def dataset():
     (x_train, y_train), (x_test, y_test) = keras.datasets.mnist.load_data()
     x_train, x_test = x_train.reshape((60000, 28, 28, 1)), x_test.reshape((10000, 28, 28, 1))
-    return Common.shuffle_data(x_train, y_train), Common.shuffle_data(x_test, y_test)
+    return common.shuffle_data(x_train, y_train), common.shuffle_data(x_test, y_test)
 
 
 def dataset_batches(batch_size=1024):
@@ -92,7 +92,7 @@ def train_batch(train_dataset, val_dataset, test_dataset, model, model_path, epo
         batch_size=batch_size,
     )
     model.evaluate(test_dataset)
-    Common.plot(data=[history], labels=[model_path])
+    common.plot(data=[history], labels=[model_path])
 
 
 def train(x_train, y_train, x_val, y_val, x_test, y_test, model, model_path, epochs, batch_size):
@@ -107,4 +107,4 @@ def train(x_train, y_train, x_val, y_val, x_test, y_test, model, model_path, epo
         batch_size=batch_size,
     )
     model.evaluate(x_test, y_test)
-    Common.plot(data=[history], labels=[model_path])
+    common.plot(data=[history], labels=[model_path])

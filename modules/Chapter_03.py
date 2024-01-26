@@ -4,7 +4,7 @@ import numpy as np
 import sys
 
 sys.path.append("../")
-from modules import Common
+from modules import common
 
 
 @dataclass
@@ -15,7 +15,7 @@ class Constant:
     n = 0.001
 
 
-class Chapter_03:
+class chapter_03:
     def __init__(self):
         self.dataset()
 
@@ -42,13 +42,13 @@ class Chapter_03:
         # Shuffle Dataset
         # ---------------------------------------------------------------
 
-        samples, labels = Common.shuffle_data(samples, labels)
+        samples, labels = common.shuffle_data(samples, labels)
 
         # ---------------------------------------------------------------
         # Split Dataset
         # ---------------------------------------------------------------
 
-        (self.x_train, self.y_train, self.x_val, self.y_val) = Common.split_data(
+        (self.x_train, self.y_train, self.x_val, self.y_val) = common.split_data(
             samples=samples,
             labels=labels,
             percent=0.3,

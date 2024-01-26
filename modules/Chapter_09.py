@@ -5,7 +5,7 @@ import numpy as np
 import random
 import os
 
-from modules import Common
+from modules import common
 
 
 load_img = tf.keras.utils.load_img
@@ -29,12 +29,12 @@ def get_path():
 def explore(img, label):
     # Convert maps from (1,2,3) to (0, 127, 254)
     normalized_array = label * 127
-    Common.plot_img(img, normalized_array[:, :, 0])
+    common.plot_img(img, normalized_array[:, :, 0])
 
 
 def explore_test(input, pred):
     mask = np.argmax(pred, axis=-1) * 127
-    Common.plot_img(input, mask)
+    common.plot_img(input, mask)
 
 
 def get_inputs(path, img_size):

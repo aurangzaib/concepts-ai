@@ -109,6 +109,7 @@ def split_data(samples, labels, percent=0.3):
 @staticmethod
 def split_data_kfold(data, fold_count, fold_size):
     """
+    Note: np.vstack does not work when any array is empty
     Note: Data must be numpy arrays, not python array
     Note: Don't shuffle data between folds
     """
@@ -116,11 +117,6 @@ def split_data_kfold(data, fold_count, fold_size):
     pre_fold = data[: fold_count * fold_size]
     post_fold = data[(fold_count + 1) * fold_size :]
     train = np.concatenate([pre_fold, post_fold], axis=0)
-    """
-    Note:
-    np.vstack does not work when any array is empty
-    train = np.vstack(tup=([pre_fold, post_fold]))
-    """
     return train, val
 
 
@@ -128,11 +124,10 @@ def split_data_kfold(data, fold_count, fold_size):
 def explore_k_fold():
     data = np.array(
         [
-            np.array([1, 2, 3]),
-            np.array([4, 5, 6]),
-            np.array([7, 8, 9]),
-            np.array([10, 11, 12]),
-            np.array([13, 14, 15]),
+            [1, 2, 3, 4],
+            [5, 6, 7, 8],
+            [9, 10, 11, 12],
+            [13, 14, 15, 16],
         ]
     )
     n = 4
@@ -176,7 +171,7 @@ Data Manipulation Functions
 
 def shuffle_data(input_samples, input_labels):
     shuffle_indices = np.random.permutation(len(input_samples))
-    return (input_samples[shuffle_indices], input_labels[shuffle_indices])
+    return input_samples[shuffle_indices], input_labels[shuffle_indices]
 
 
 def multihot_encode_data(input_samples, dimension):

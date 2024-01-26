@@ -4,7 +4,7 @@ import numpy as np
 import sys
 
 sys.path.append("../")
-from modules import Common
+from modules import common
 
 
 # =================================================================================
@@ -16,24 +16,20 @@ class BinaryClassification:
         num_words = 10000
 
         # Imdb dataset
-        (x_train_og, y_train_og), (x_test_og, y_test_og) = BinaryClassification.dataset(
-            num_words
-        )
+        (x_train_og, y_train_og), (x_test_og, y_test_og) = BinaryClassification.dataset(num_words)
 
         # Shuffle dataset
-        x_train_og, y_train_og = Common.shuffle_data(x_train_og, y_train_og)
-        x_test_og, y_test_og = Common.shuffle_data(x_test_og, y_test_og)
+        x_train_og, y_train_og = common.shuffle_data(x_train_og, y_train_og)
+        x_test_og, y_test_og = common.shuffle_data(x_test_og, y_test_og)
 
         # Vectorize dataset
         (x_train, y_train), (
             x_test,
             y_test,
-        ) = BinaryClassification.multihot_encode_data(
-            x_train_og, y_train_og, x_test_og, y_test_og, num_words
-        )
+        ) = BinaryClassification.multihot_encode_data(x_train_og, y_train_og, x_test_og, y_test_og, num_words)
 
         # Split dataset
-        x_train, y_train, x_val, y_val = Common.split_data(x_train, y_train, 0.4)
+        x_train, y_train, x_val, y_val = common.split_data(x_train, y_train, 0.4)
         return x_train, y_train, x_val, y_val, x_test, y_test
 
     @staticmethod
@@ -42,9 +38,9 @@ class BinaryClassification:
         return imdb.load_data(num_words=num_words)
 
     def multihot_encode_data(x, y, xt, yt, num_words):
-        x_train = Common.multihot_encode_data(x, num_words)
+        x_train = common.multihot_encode_data(x, num_words)
         y_train = np.asarray(y).astype(np.float32)
-        x_test = Common.multihot_encode_data(xt, num_words)
+        x_test = common.multihot_encode_data(xt, num_words)
         y_test = np.asarray(yt).astype(np.float32)
         return (x_train, y_train), (x_test, y_test)
 
@@ -93,7 +89,7 @@ class BinaryClassification:
             [
                 tf.keras.layers.Dense(
                     units=1,
-                    kernel_regularizer=regularizer.l2(weight_decay),
+                    kernel_regularizer=regularizer.l2(l2=weight_decay),
                     activation=tf.nn.relu,
                 ),
                 tf.keras.layers.Dense(units=1, activation=tf.nn.sigmoid),
@@ -111,7 +107,6 @@ class BinaryClassification:
     def get_model_with_dropout(drop_rate=0.1, learning_rate=0.001):
         # Create the model
         # Output: Probability
-        regularizer = tf.keras.regularizers
         model = tf.keras.Sequential(
             [
                 tf.keras.layers.Dense(units=1, activation=tf.nn.relu),
@@ -127,9 +122,14 @@ class BinaryClassification:
         )
         return model
 
-    def train(x, y, x_val, y_val, model, epochs):
+    def train(x, y, x_val, y_val, model, epochs, batch_size=1024):
         history = model.fit(
-            x=x, y=y, epochs=epochs, validation_data=(x_val, y_val), verbose=False
+            x=x,
+            y=y,
+            epochs=epochs,
+            validation_data=(x_val, y_val),
+            batch_size=batch_size,
+            verbose=False,
         )
         return history
 
@@ -149,9 +149,9 @@ class MultiClassification:
         model = tf.keras.Sequential(
             [
                 tf.keras.layers.Dense(units=32, activation=tf.nn.relu),
-                tf.keras.layers.Dropout(0.1),  # To improve overfit
+                tf.keras.layers.Dropout(0.1),
                 tf.keras.layers.Dense(units=32, activation=tf.nn.relu),
-                tf.keras.layers.Dropout(0.1),  # To improve overfit
+                tf.keras.layers.Dropout(0.1),
                 tf.keras.layers.Dense(units=46, activation=tf.nn.softmax),
             ]
         )

@@ -4,7 +4,7 @@ import tensorflow as tf
 import sys
 
 sys.path.append("../")
-from modules import Common
+from modules import common
 
 
 # =====================================================================
@@ -16,7 +16,7 @@ def prepare():
     # Mnist dataset
     (train_samples, train_labels), (test_samples, test_labels) = dataset(with_text=False)
     # Shuffle dataset
-    train_samples, train_labels = Common.shuffle_data(train_samples, train_labels)
+    train_samples, train_labels = common.shuffle_data(train_samples, train_labels)
     return (train_samples, train_labels), (test_samples, test_labels)
 
 
@@ -133,7 +133,7 @@ def get_large_model(learning_rate=0.001):
             keras.layers.Dense(units=10, activation=tf.nn.softmax),
         ]
     )
-    compile(model, learning_rate)
+    compile(model, learning_rate=learning_rate)
     return model
 
 
