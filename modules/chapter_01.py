@@ -21,7 +21,7 @@ def prepare():
 
 
 def dataset(with_text=True):
-    mnist = tf.keras.datasets.mnist
+    mnist = keras.datasets.mnist
     (x_train, y_train), (x_test, y_test) = mnist.load_data()
 
     if with_text is True:
@@ -72,8 +72,8 @@ def get_small_model(learning_rate=0.001):
     # Backward Propagation Configuration
     # ---------------------------------
     model.compile(
-        loss=tf.keras.losses.SparseCategoricalCrossentropy(),
-        optimizer=tf.keras.optimizers.legacy.RMSprop(learning_rate),
+        loss=keras.losses.SparseCategoricalCrossentropy(),
+        optimizer=keras.optimizers.legacy.RMSprop(learning_rate),
         metrics=[keras.metrics.SparseCategoricalAccuracy()],
     )
     return model
@@ -93,8 +93,8 @@ def get_model(learning_rate=0.001):
     # Backward Propagation Configuration
     # ---------------------------------
     model.compile(
-        loss=tf.keras.losses.SparseCategoricalCrossentropy(),
-        optimizer=tf.keras.optimizers.legacy.RMSprop(learning_rate),
+        loss=keras.losses.SparseCategoricalCrossentropy(),
+        optimizer=keras.optimizers.legacy.RMSprop(learning_rate),
         metrics=[keras.metrics.SparseCategoricalAccuracy()],
     )
     return model
@@ -142,8 +142,8 @@ def get_large_model(learning_rate=0.001):
 # ---------------------------------
 def compile(model, metrics=keras.metrics.SparseCategoricalAccuracy(), learning_rate=0.001):
     model.compile(
-        loss=tf.keras.losses.SparseCategoricalCrossentropy(),
-        optimizer=tf.keras.optimizers.legacy.RMSprop(learning_rate),
+        loss=keras.losses.SparseCategoricalCrossentropy(),
+        optimizer=keras.optimizers.legacy.RMSprop(learning_rate),
         metrics=[metrics],
     )
     return model
