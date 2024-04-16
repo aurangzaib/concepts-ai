@@ -112,6 +112,12 @@ def split_data_kfold(data, fold_count, fold_size):
     Note: np.vstack does not work when any array is empty
     Note: Data must be numpy arrays, not python array
     Note: Don't shuffle data between folds
+
+    Alternate:
+    val = data[fold_count : fold_count + fold_size]
+    pre_fold = data[:fold_count]
+    post_fold = data[fold_count + fold_size :]
+    train = np.concatenate([pre_fold, post_fold], axis=0)
     """
     val = data[fold_count * fold_size : (fold_count + 1) * fold_size]
     pre_fold = data[: fold_count * fold_size]
@@ -154,11 +160,16 @@ Data Augmentation Functions
 
 
 def add_white_noise(input):
-    print(input.shape)
+    """
+    Add white noise features in each sample
+    """
     return np.hstack((input, np.random.random(size=(input.shape[0], input.shape[1]))))
 
 
 def add_zero_channel(input):
+    """
+    Add zero channel features in each sample
+    """
     return np.hstack((input, np.zeros(shape=(input.shape[0], input.shape[1]))))
 
 
