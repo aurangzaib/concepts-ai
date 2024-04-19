@@ -12,7 +12,7 @@ Data Visualization Functions
 """
 
 
-def plot(data, labels, window_titles=["Accuracy", "Loss"], only_val=False, start_index=0):
+def plot(data: list, labels: list, window_titles=["Accuracy", "Loss"], only_val=False, start_index=0):
     # Name of loss and accuracy metrics
     keys = history_keys(data[0])
     loss_name, acc_name = keys[0], keys[1]
@@ -190,6 +190,8 @@ def multihot_encode_data(input_samples, dimension):
     Samples:
     - Length of each review is not uniform
     - Use Multi-hot encoding to have a uniform review length
+    Note:
+    - keras.utils.to_categorical() can also be used
     """
     output_samples = np.zeros(shape=(input_samples.shape[0], dimension))
     for sample_index, word_indices in enumerate(input_samples):
