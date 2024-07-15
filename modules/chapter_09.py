@@ -16,20 +16,14 @@ def get_path():
     input_dir = "../resources/datasets/02-oxford-pets/images/"
     target_dir = "../resources/datasets/02-oxford-pets/annotations/trimaps/"
     input_paths = sorted([os.path.join(input_dir, fname) for fname in os.listdir(input_dir) if fname.endswith(".jpg")])
-    label_paths = sorted(
-        [
-            os.path.join(target_dir, fname)
-            for fname in os.listdir(target_dir)
-            if fname.endswith(".png") and not fname.startswith(".")
-        ]
-    )
+    label_paths = sorted([os.path.join(target_dir, fname) for fname in os.listdir(target_dir) if fname.endswith(".png") and not fname.startswith(".")])
     return input_paths, label_paths, len(input_paths)
 
 
 def explore(img, label):
     # Convert maps from (1,2,3) to (0, 127, 254)
-    normalized_array = label * 127
-    common.plot_img(img, normalized_array[:, :, 0])
+    normalized_array = (label.astype("uint8") - 1) * 127
+    common.plot_img(img, label)
 
 
 def explore_test(input, pred):
@@ -43,7 +37,7 @@ def get_inputs(path, img_size):
 
 def get_labels(path, img_size):
     img = img_to_array(load_img(path, target_size=img_size, color_mode="grayscale"))
-    img = img.astype("uint8") - 1
+    # img = img.astype("uint8") - 1
     return img
 
 

@@ -142,8 +142,8 @@ def get_large_model(learning_rate=0.001):
 # ---------------------------------
 def compile(model, metrics=keras.metrics.SparseCategoricalAccuracy(), learning_rate=0.001):
     model.compile(
-        loss=keras.losses.SparseCategoricalCrossentropy(),
         optimizer=keras.optimizers.legacy.RMSprop(learning_rate),
+        loss=keras.losses.SparseCategoricalCrossentropy(),
         metrics=[metrics],
     )
     return model
@@ -162,7 +162,7 @@ def train(x, y, model, val_percent=0.3, batch_size=1024, callbacks=None, epochs=
         validation_split=val_percent,
         batch_size=batch_size,
         callbacks=callbacks,
-        verbose=False,
+        verbose=True,
         epochs=epochs,
     )
     return history
