@@ -43,6 +43,46 @@ def dataset(with_text=True):
     return (x_train, y_train), (x_test, y_test)
 
 
+def get_model(input_size, num_classes):
+    # -----------------------------------------
+    # Input Layer
+    # -----------------------------------------
+    i = keras.Input(shape=input_size + (3,), name="Layer_Input")
+    x = keras.layers.Rescaling(1.0 / 255, name="Layer_Rescale")(i)
+    # -----------------------------------------
+    # Downsampling Layers
+    # -----------------------------------------
+    x = keras.layers.SeparableConv2D(filters=64, kernel_size=3, padding="same", activation=tf.nn.relu, strides=2, name="Conv_1")(x)
+    x = keras.layers.SeparableConv2D(filters=64, kernel_size=3, padding="same", activation=tf.nn.relu, name="Conv_2")(x)
+    x = keras.layers.BatchNormalization()(x)
+    r = x
+    x = keras.layers.SeparableConv2D(filters=128, kernel_size=3, padding="same", activation=tf.nn.relu, strides=2, name="Conv_3")(x)
+    r = keras.layers.SeparableConv2D(filters=128, kernel_size=1, strides=2)(r)
+    x = keras.layers.add([x, r])
+    x = keras.layers.SeparableConv2D(filters=128, kernel_size=3, padding="same", activation=tf.nn.relu, name="Conv_4")(x)
+    x = keras.layers.SeparableConv2D(filters=256, kernel_size=3, padding="same", activation=tf.nn.relu, strides=2, name="Conv_5")(x)
+    x = keras.layers.SeparableConv2D(filters=256, kernel_size=3, padding="same", activation=tf.nn.relu, name="Conv_6")(x)
+    # -----------------------------------------
+    # Upsampling Layers
+    # -----------------------------------------
+    x = keras.layers.Conv2DTranspose(filters=256, kernel_size=3, padding="same", activation=tf.nn.relu, name="Conv_6T")(x)
+    x = keras.layers.Conv2DTranspose(filters=256, kernel_size=3, padding="same", activation=tf.nn.relu, strides=2, name="Conv_5T")(x)
+    x = keras.layers.Conv2DTranspose(filters=128, kernel_size=3, padding="same", activation=tf.nn.relu, name="Conv_4T")(x)
+    x = keras.layers.Conv2DTranspose(filters=128, kernel_size=3, padding="same", activation=tf.nn.relu, strides=2, name="Conv_3T")(x)
+    x = keras.layers.Conv2DTranspose(filters=64, kernel_size=3, padding="same", activation=tf.nn.relu, name="Conv_2T")(x)
+    x = keras.layers.Conv2DTranspose(filters=64, kernel_size=3, padding="same", activation=tf.nn.relu, strides=2, name="Conv_1T", kernel_regularizer=keras.regularizers.l2(l2=0.002))(x)
+    x = keras.layers.Dropout(rate=0.25)(x)
+    # -----------------------------------------
+    # Output Layer
+    # -----------------------------------------
+    o = keras.layers.Conv2D(filters=num_classes, kernel_size=3, padding="same", activation=tf.nn.softmax, name="Layer_Output")(x)
+    # -----------------------------------------
+    # Model
+    # -----------------------------------------
+    model = keras.Model(inputs=i, outputs=o)
+    return model
+
+
 # =====================================================================
 # Visualize
 # =====================================================================

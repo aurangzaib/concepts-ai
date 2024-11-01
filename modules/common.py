@@ -224,7 +224,9 @@ def callbacks(
 ):
     return [
         keras.callbacks.EarlyStopping(monitor=metric_stop, patience=3),
-        keras.callbacks.ModelCheckpoint(filepath=model_dir, monitor=metric_model, save_only_best=True),
+        keras.callbacks.ModelCheckpoint(filepath=model_dir, 
+                                        monitor=metric_model,
+                                        save_only_best=True),
         keras.callbacks.TensorBoard(log_dir=log_dir),
     ]
 
